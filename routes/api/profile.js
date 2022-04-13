@@ -4,7 +4,6 @@ const config = require('config');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const { check, validationResult } = require('express-validator');
-// bring in normalize to give us a proper url, regardless of what user entered
 const normalize = require('normalize-url');
 const checkObjectId = require('../../middleware/checkObjectId');
 
@@ -14,7 +13,8 @@ const Post = require('../../models/Post');
 
 // @route    GET api/profile/me
 // @desc     Get current users profile
-// @access   Private
+// @access   Private'
+
 router.get('/me', auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({
@@ -34,7 +34,8 @@ router.get('/me', auth, async (req, res) => {
 
 // @route    POST api/profile
 // @desc     Create or update user profile
-// @access   Private
+// @access   Private'
+
 router.post(
   '/',
   auth,
@@ -46,7 +47,6 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // destructure the request
     const {
       website,
       skills,
@@ -55,7 +55,6 @@ router.post(
       instagram,
       linkedin,
       facebook,
-      // spread the rest of the fields we don't need to check
       ...rest
     } = req.body;
 
@@ -72,10 +71,8 @@ router.post(
       ...rest
     };
 
-    // Build socialFields object
     const socialFields = { youtube, twitter, instagram, linkedin, facebook };
 
-    // normalize social fields to ensure valid url
     for (const [key, value] of Object.entries(socialFields)) {
       if (value && value.length > 0)
         socialFields[key] = normalize(value, { forceHttps: true });
@@ -84,7 +81,6 @@ router.post(
     profileFields.social = socialFields;
 
     try {
-      // Using upsert option (creates new doc if no match is found):
       let profile = await Profile.findOneAndUpdate(
         { user: req.user.id },
         { $set: profileFields },
@@ -101,6 +97,7 @@ router.post(
 // @route    GET api/profile
 // @desc     Get all profiles
 // @access   Public
+
 router.get('/', async (req, res) => {
   try {
     const profiles = await Profile.find().populate('user', ['name', 'avatar']);
@@ -114,6 +111,7 @@ router.get('/', async (req, res) => {
 // @route    GET api/profile/user/:user_id
 // @desc     Get profile by user ID
 // @access   Public
+
 router.get(
   '/user/:user_id',
   checkObjectId('user_id'),
@@ -141,6 +139,7 @@ router.delete('/', auth, async (req, res) => {
     // Remove user posts
     // Remove profile
     // Remove user
+    
     await Promise.all([
       Post.deleteMany({ user: req.user.id }),
       Profile.findOneAndRemove({ user: req.user.id }),
@@ -157,6 +156,7 @@ router.delete('/', auth, async (req, res) => {
 // @route    PUT api/profile/experience
 // @desc     Add profile experience
 // @access   Private
+
 router.put(
   '/experience',
   auth,
@@ -209,6 +209,7 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
 // @route    PUT api/profile/education
 // @desc     Add profile education
 // @access   Private
+
 router.put(
   '/education',
   auth,
@@ -260,6 +261,7 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
 // @route    GET api/profile/github/:username
 // @desc     Get user repos from Github
 // @access   Public
+
 router.get('/github/:username', async (req, res) => {
   try {
     const uri = encodeURI(
