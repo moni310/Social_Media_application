@@ -171,6 +171,7 @@ export const addEducation = (formData, navigate) => async (dispatch) => {
   }
 };
 
+
 // Delete experience
 export const deleteExperience = (id) => async (dispatch) => {
   try {
